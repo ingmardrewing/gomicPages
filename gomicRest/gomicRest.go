@@ -6,6 +6,7 @@ import (
 	"log"
 
 	restful "github.com/emicklei/go-restful"
+	"github.com/ingmardrewing/gomicRest/content"
 	"github.com/ingmardrewing/gomicRest/db"
 )
 
@@ -27,9 +28,10 @@ func New() *restful.WebService {
 }
 
 func PutPage(request *restful.Request, response *restful.Response) {
-	log.Print("Put page")
-	msg := Msg{"page put"}
-	response.WriteEntity(msg)
+	p := new(content.Page)
+	request.ReadEntity(p)
+	db.Insert(p)
+	response.WriteEntity(p)
 }
 
 func GetPage(request *restful.Request, response *restful.Response) {
@@ -38,7 +40,7 @@ func GetPage(request *restful.Request, response *restful.Response) {
 	response.WriteEntity(page)
 }
 
-func getPage(id string) Page {
+func getPage(id string) content.Page {
 	rows := db.Query(fmt.Sprintf("SELECT * FROM gomic.pages where id = %s", id))
 	pages := getDbData(rows)
 	return pages[0]
@@ -49,13 +51,13 @@ func GetPages(request *restful.Request, response *restful.Response) {
 	response.WriteEntity(pages)
 }
 
-func getAllPages() []Page {
+func getAllPages() []content.Page {
 	rows := db.Query("SELECT * FROM gomic.pages")
 	return getDbData(rows)
 }
 
-func getDbData(rows *sql.Rows) []Page {
-	pages := []Page{}
+func getDbData(rows *sql.Rows) []content.Page {
+	pages := []content.Page{}
 	if rows != nil {
 		defer rows.Close()
 		for rows.Next() {
@@ -78,7 +80,7 @@ func getDbData(rows *sql.Rows) []Page {
 				&act,
 				&pageNumber)
 
-			pages = append(pages, Page{
+			pages = append(pages, content.Page{
 				Id:         id,
 				Title:      title.String,
 				Path:       path.String,
@@ -93,7 +95,7 @@ func getDbData(rows *sql.Rows) []Page {
 
 func PostPage(request *restful.Request, response *restful.Response) {
 	log.Printf("Posting page")
-	p := new(Page)
+	p := new(content.Page)
 	request.ReadEntity(p)
 	response.WriteEntity(p)
 }
@@ -102,15 +104,6 @@ func DeletePage(request *restful.Request, response *restful.Response) {
 	log.Printf("Delete page")
 	msg := Msg{"page deleted"}
 	response.WriteEntity(msg)
-}
-
-/**
- * struct for the comic page
- */
-
-type Page struct {
-	Id, PageNumber                     int
-	Title, Path, ImgUrl, DisqusId, Act string
 }
 
 /**

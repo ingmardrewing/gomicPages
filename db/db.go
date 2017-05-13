@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/ingmardrewing/gomicRest/config"
+	"github.com/ingmardrewing/gomicRest/content"
 )
 
 var db *sql.DB
@@ -38,12 +39,23 @@ func Query(query string) *sql.Rows {
 	return rows
 }
 
-func InsertPage() {
-	/*
-		ins := fmt.Sprintf("INSERT INTO pages (title, path, imgUrl, disqusId, act) VALUES('%s', '%s', '%s', '%s', '%s');\n", p.Title(), p.FSPath(), p.ImgUrl(), p.DisqusId(), "Act III")
-		_, err := db.Exec(ins)
-		if err != nil {
-			panic(err.Error())
-		}
-	*/
+func Insert(p *content.Page) {
+	stmt, err := db.Prepare("INSERT INTO pages(id, title, path, imgUrl, disqusId, act, pageNumber) VALUES(?, ?, ?, ?, ?, ?, ?)")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res, err := stmt.Exec(p.Id, p.Title, p.Path, p.ImgUrl, p.DisqusId, p.Act, p.PageNumber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	lastId, err := res.LastInsertId()
+	if err != nil {
+		log.Fatal(err)
+	}
+	rowCnt, err := res.RowsAffected()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
 }
