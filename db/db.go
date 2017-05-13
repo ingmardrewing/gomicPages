@@ -40,12 +40,12 @@ func Query(query string) *sql.Rows {
 }
 
 func Insert(p *content.Page) {
-	stmt, err := db.Prepare("INSERT INTO pages(id, title, path, imgUrl, disqusId, act, pageNumber) VALUES(?, ?, ?, ?, ?, ?, ?)")
+	stmt, err := db.Prepare("INSERT INTO pages(title, path, imgUrl, disqusId, act, pageNumber) VALUES(?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	res, err := stmt.Exec(p.Id, p.Title, p.Path, p.ImgUrl, p.DisqusId, p.Act, p.PageNumber)
+	res, err := stmt.Exec(p.Title, p.Path, p.ImgUrl, p.DisqusId, p.Act, p.PageNumber)
 	if err != nil {
 		log.Fatal(err)
 	}
