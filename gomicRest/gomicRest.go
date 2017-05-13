@@ -22,7 +22,7 @@ func New() *restful.WebService {
 	service.Route(service.GET("/{page-id}").To(GetPage))
 	service.Route(service.GET("/").To(GetPages))
 	service.Route(service.PUT("/").To(PutPage))
-	service.Route(service.POST("/").To(PostPage))
+	service.Route(service.POST("/{page-id}").To(PostPage))
 	service.Route(service.DELETE("/").To(DeletePage))
 	return service
 }
@@ -94,9 +94,10 @@ func getDbData(rows *sql.Rows) []content.Page {
 }
 
 func PostPage(request *restful.Request, response *restful.Response) {
-	log.Printf("Posting page")
 	p := new(content.Page)
 	request.ReadEntity(p)
+	id := request.PathParameter("page-id")
+	db.Update(p, id)
 	response.WriteEntity(p)
 }
 
