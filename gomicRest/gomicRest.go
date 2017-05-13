@@ -105,11 +105,3 @@ func DeletePage(request *restful.Request, response *restful.Response) {
 	id := request.PathParameter("page-id")
 	db.Delete(id)
 }
-
-/**
- * struct for a no-read request
- */
-
-type Msg struct {
-	msg string
-}
