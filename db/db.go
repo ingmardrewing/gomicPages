@@ -56,6 +56,18 @@ func Update(p *content.Page, id string) {
 	log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
 }
 
+func Delete(id string) {
+	stmt, err := db.Prepare("DELETE FROM pages WHERE id=?")
+	handleErr(err)
+	res, err := stmt.Exec(id)
+	handleErr(err)
+	lastId, err := res.LastInsertId()
+	handleErr(err)
+	rowCnt, err := res.RowsAffected()
+	handleErr(err)
+	log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
+}
+
 func handleErr(err error) {
 	if err != nil {
 		log.Fatal(err)
