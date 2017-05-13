@@ -32,6 +32,7 @@ func getDb(dsn string) *sql.DB {
 func Query(query string) *sql.Rows {
 	rows, err := db.Query(query)
 	if err != nil {
+		log.Println("Query error")
 		panic(err.Error())
 	}
 	return rows

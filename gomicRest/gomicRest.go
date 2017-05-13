@@ -1,9 +1,11 @@
 package gomicRest
 
 import (
+	"database/sql"
 	"log"
 
 	restful "github.com/emicklei/go-restful"
+	"github.com/ingmardrewing/gomicRest/db"
 )
 
 func New() *restful.WebService {
@@ -40,10 +42,48 @@ func GetPage(request *restful.Request, response *restful.Response) {
 func GetPages(request *restful.Request, response *restful.Response) {
 	log.Println("Get pages")
 
-	p1 := Page{0, 0, "test title", "/test/path", "test imgurl", "testdisqusid", "testact"}
-	p2 := Page{1, 1, "test title", "/test/path", "test imgurl", "testdisqusid", "testact"}
-	p3 := Page{2, 2, "test title", "/test/path", "test imgurl", "testdisqusid", "testact"}
-	response.WriteEntity([]Page{p1, p2, p3})
+	pages := getAllPages()
+	response.WriteEntity(pages)
+}
+
+func getAllPages() []Page {
+	pages := []Page{}
+	log.Println("about to query")
+	rows := db.Query("SELECT * FROM gomic.pages")
+	log.Println("actually queried ..")
+	if rows != nil {
+		defer rows.Close()
+		for rows.Next() {
+			var (
+				id         int
+				title      sql.NullString
+				path       sql.NullString
+				imgUrl     sql.NullString
+				disqusId   sql.NullString
+				act        sql.NullString
+				pageNumber int
+			)
+
+			rows.Scan(
+				&id,
+				&title,
+				&path,
+				&imgUrl,
+				&disqusId,
+				&act,
+				&pageNumber)
+
+			pages = append(pages, Page{
+				Id:         id,
+				Title:      title.String,
+				Path:       path.String,
+				ImgUrl:     imgUrl.String,
+				DisqusId:   disqusId.String,
+				Act:        act.String,
+				PageNumber: pageNumber})
+		}
+	}
+	return pages
 }
 
 func PostPage(request *restful.Request, response *restful.Response) {
