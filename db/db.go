@@ -41,21 +41,18 @@ func Query(query string) *sql.Rows {
 
 func Insert(p *content.Page) {
 	stmt, err := db.Prepare("INSERT INTO pages(title, path, imgUrl, disqusId, act, pageNumber) VALUES(?, ?, ?, ?, ?, ?)")
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	handleErr(err)
 	res, err := stmt.Exec(p.Title, p.Path, p.ImgUrl, p.DisqusId, p.Act, p.PageNumber)
-	if err != nil {
-		log.Fatal(err)
-	}
+	handleErr(err)
 	lastId, err := res.LastInsertId()
-	if err != nil {
-		log.Fatal(err)
-	}
+	handleErr(err)
 	rowCnt, err := res.RowsAffected()
+	handleErr(err)
+	log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
+}
+
+func handleErr(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
 }
