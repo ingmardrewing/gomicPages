@@ -44,6 +44,18 @@ func Insert(p *content.Page) {
 	log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
 }
 
+func Update(p *content.Page) {
+	stmt, err := db.Prepare("UPDATE pages SET title=?, path=?, imgUrl=?, disqusId=?, act=?, pageNumber=? WHERE id=?)")
+	handleErr(err)
+	res, err := stmt.Exec(p.Title, p.Path, p.ImgUrl, p.DisqusId, p.Act, p.PageNumber, p.Id)
+	handleErr(err)
+	lastId, err := res.LastInsertId()
+	handleErr(err)
+	rowCnt, err := res.RowsAffected()
+	handleErr(err)
+	log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
+}
+
 func handleErr(err error) {
 	if err != nil {
 		log.Fatal(err)
