@@ -2,6 +2,7 @@ package gomicRest
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	restful "github.com/emicklei/go-restful"
@@ -32,25 +33,29 @@ func PutPage(request *restful.Request, response *restful.Response) {
 }
 
 func GetPage(request *restful.Request, response *restful.Response) {
-	pageId := request.PathParameter("page-id")
-	log.Printf("Get page: %s", pageId)
-
-	page := Page{0, 0, "test title", "/test/path", "test imgurl", "testdisqusid", "testact"}
+	id := request.PathParameter("page-id")
+	page := getPage(id)
 	response.WriteEntity(page)
 }
 
-func GetPages(request *restful.Request, response *restful.Response) {
-	log.Println("Get pages")
+func getPage(id string) Page {
+	rows := db.Query(fmt.Sprintf("SELECT * FROM gomic.pages where id = %s", id))
+	pages := getDbData(rows)
+	return pages[0]
+}
 
+func GetPages(request *restful.Request, response *restful.Response) {
 	pages := getAllPages()
 	response.WriteEntity(pages)
 }
 
 func getAllPages() []Page {
-	pages := []Page{}
-	log.Println("about to query")
 	rows := db.Query("SELECT * FROM gomic.pages")
-	log.Println("actually queried ..")
+	return getDbData(rows)
+}
+
+func getDbData(rows *sql.Rows) []Page {
+	pages := []Page{}
 	if rows != nil {
 		defer rows.Close()
 		for rows.Next() {
