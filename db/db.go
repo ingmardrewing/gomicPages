@@ -20,22 +20,15 @@ func Initialize() {
 
 func getDb(dsn string) *sql.DB {
 	d, err := sql.Open("mysql", dsn)
-	if nil != err {
-		panic(err)
-	}
+	handleErr(err)
 	err = d.Ping()
-	if nil != err {
-		panic(err)
-	}
+	handleErr(err)
 	return d
 }
 
 func Query(query string) *sql.Rows {
 	rows, err := db.Query(query)
-	if err != nil {
-		log.Println("Query error")
-		panic(err.Error())
-	}
+	handleErr(err)
 	return rows
 }
 
