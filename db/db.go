@@ -90,6 +90,11 @@ func GetAllPages() []content.Page {
 	return getDbData(rows)
 }
 
+func GetLatestPage() content.Page {
+	pages := GetAllPages()
+	return pages[len(pages)-1]
+}
+
 func getDbData(rows *sql.Rows) []content.Page {
 	pages := []content.Page{}
 	if rows != nil {

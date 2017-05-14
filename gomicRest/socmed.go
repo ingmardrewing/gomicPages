@@ -5,6 +5,7 @@ import (
 	"log"
 	"unicode/utf8"
 
+	"github.com/MariaTerzieva/gotumblr"
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
 	restful "github.com/emicklei/go-restful"
@@ -23,6 +24,8 @@ func NewSocMedService() *restful.WebService {
 	log.Printf("Creating socmed service at localhost:8080 -- access with http://localhost:8080%s\n", path)
 
 	service.Route(service.POST("/twitter").Filter(basicAuthenticate).To(Tweet))
+	service.Route(service.POST("/tumblr").Filter(basicAuthenticate).To(PostToTumblr))
+
 	return service
 }
 
@@ -56,8 +59,7 @@ func Tweet(request *restful.Request, response *restful.Response) {
 }
 
 func getTweetText() string {
-	pages := db.GetAllPages()
-	lastPage := pages[len(pages)-1]
+	lastPage := db.GetLatestPage()
 
 	url := "https://devabo.de" + lastPage.Path
 	tweet := lastPage.Title + " " + url
@@ -72,21 +74,37 @@ func getTweetText() string {
 	return tweet
 }
 
-/*
-func PostToTumblr() {
+func PostToTumblr(request *restful.Request, response *restful.Response) {
 	fmt.Println("Post to tumblr")
-	cons_key, cons_secret, token, token_secret := config.GetTumblData()
-	client := gotumblr.NewTumblrRestClient(cons_key, cons_secret, token, token_secret, "http://localhost/~drewing/cgi-bin/tumblr.pl", "http://api.tumblr.com")
+
+	page := db.GetLatestPage()
+
+	cons_key := config.GetTumblrConsumerKey()
+	cons_secret := config.GetTumblrConsumerSecret()
+	token := config.GetTumblrToken()
+	token_secret := config.GetTumblrTokenSecret()
+
+	tumblr_callback_url := "http://localhost/~drewing/cgi-bin/tumblr.pl"
+
+	client := gotumblr.NewTumblrRestClient(
+		cons_key,
+		cons_secret,
+		token,
+		token_secret,
+		tumblr_callback_url,
+		"http://api.tumblr.com")
 
 	blogname := "devabo-de.tumblr.com"
 	state := "published"
 	tags := "comic,webcomic,graphicnovel,drawing,art,narrative,scifi,sci-fi,science-fiction,dystopy,parody,humor,nerd,pulp,geek,blackandwhite"
+	prodUrl := "https://devabo.de" + page.Path
+
 	photoPostByURL := client.CreatePhoto(
 		blogname,
 		map[string]string{
 			"link":    prodUrl,
-			"source":  imgurl,
-			"caption": title,
+			"source":  page.ImgUrl,
+			"caption": page.Title,
 			"tags":    tags,
 			"state":   state})
 	if photoPostByURL == nil {
@@ -95,4 +113,3 @@ func PostToTumblr() {
 		fmt.Println(photoPostByURL)
 	}
 }
-*/
