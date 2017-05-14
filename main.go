@@ -21,7 +21,8 @@ type Page struct {
 func main() {
 	db.Initialize()
 
-	restful.Add(gomicRest.New())
+	restful.Add(gomicRest.NewPagesService())
+	restful.Add(gomicRest.NewSocMedService())
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {

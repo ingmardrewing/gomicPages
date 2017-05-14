@@ -13,15 +13,15 @@ import (
 	"github.com/ingmardrewing/gomicRest/db"
 )
 
-func New() *restful.WebService {
-	pagePath := "/gomic/page"
+func NewPagesService() *restful.WebService {
+	path := "/0.1/gomic/page"
 	service := new(restful.WebService)
 	service.
-		Path(pagePath).
+		Path(path).
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
-	log.Printf("Starting server at localhost:8080 -- access with http://localhost:8080%s\n", pagePath)
+	log.Printf("Creating pages servicel at localhost:8080 -- access with http://localhost:8080%s\n", path)
 	service.Route(service.GET("/{page-id}").Filter(basicAuthenticate).To(GetPage))
 	service.Route(service.GET("/").Filter(basicAuthenticate).To(GetPages))
 	service.Route(service.PUT("/").Filter(basicAuthenticate).To(PutPage))
