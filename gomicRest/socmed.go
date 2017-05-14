@@ -1,7 +1,6 @@
 package gomicRest
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/dghubble/go-twitter/twitter"
@@ -37,16 +36,9 @@ func Tweet(request *restful.Request, response *restful.Response) {
 
 	client := twitter.NewClient(httpClient)
 
-	verifyParams := &twitter.AccountVerifyParams{
-		SkipStatus:   twitter.Bool(true),
-		IncludeEmail: twitter.Bool(true)}
-
-	user, _, _ := client.Accounts.VerifyCredentials(verifyParams)
-	fmt.Printf("User's Account:\n%+v\n", user)
-
+	// actually tweet
 	/*
-		id := request.PathParameter("page-id")
-		page := getPage(id)
-		response.WriteEntity(page)
+		tweet, _, _ := client.Statuses.Update("only testing to tweet via go ... next comic update is still in the making #golang #go", nil)
+		fmt.Printf("Posted tweet \n%v\n", tweet)
 	*/
 }
