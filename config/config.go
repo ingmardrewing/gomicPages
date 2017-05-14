@@ -57,3 +57,7 @@ func GetTumblrToken() string {
 func GetTumblrTokenSecret() string {
 	return os.Getenv("GOMIC_TUMBLR_TOKEN_SECRET")
 }
+
+func GetTags() []string {
+	return []string{"#inked", "#inking", "#illustration", "#drawing", "#drawings", "#art", "#artwork", "#draw", "#painting", "#sketch", "#sketchbook", "#artist", "#comics", "#comicart", "#comic", "#graphicnovel", "#design", "#concept", "#conceptart", "#create", "#creative", "#image", "#imagination"}
+}

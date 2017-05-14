@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -71,4 +72,57 @@ func handleErr(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func GetPage(id string) content.Page {
+	rows := Query(fmt.Sprintf("SELECT * FROM gomic.pages where id = %s", id))
+	if rows != nil {
+		pages := getDbData(rows)
+		if len(pages) > 0 {
+			return pages[0]
+		}
+	}
+	return content.EmptyPage()
+}
+
+func GetAllPages() []content.Page {
+	rows := Query("SELECT * FROM gomic.pages")
+	return getDbData(rows)
+}
+
+func getDbData(rows *sql.Rows) []content.Page {
+	pages := []content.Page{}
+	if rows != nil {
+		defer rows.Close()
+		for rows.Next() {
+			var (
+				id         int
+				title      sql.NullString
+				path       sql.NullString
+				imgUrl     sql.NullString
+				disqusId   sql.NullString
+				act        sql.NullString
+				pageNumber int
+			)
+
+			rows.Scan(
+				&id,
+				&title,
+				&path,
+				&imgUrl,
+				&disqusId,
+				&act,
+				&pageNumber)
+
+			pages = append(pages, content.Page{
+				Id:         id,
+				Title:      title.String,
+				Path:       path.String,
+				ImgUrl:     imgUrl.String,
+				DisqusId:   disqusId.String,
+				Act:        act.String,
+				PageNumber: pageNumber})
+		}
+	}
+	return pages
 }

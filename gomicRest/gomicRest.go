@@ -1,7 +1,6 @@
 package gomicRest
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
@@ -55,66 +54,13 @@ func PutPage(request *restful.Request, response *restful.Response) {
 
 func GetPage(request *restful.Request, response *restful.Response) {
 	id := request.PathParameter("page-id")
-	page := getPage(id)
+	page := db.GetPage(id)
 	response.WriteEntity(page)
 }
 
-func getPage(id string) content.Page {
-	rows := db.Query(fmt.Sprintf("SELECT * FROM gomic.pages where id = %s", id))
-	if rows != nil {
-		pages := getDbData(rows)
-		if len(pages) > 0 {
-			return pages[0]
-		}
-	}
-	return content.EmptyPage()
-}
-
 func GetPages(request *restful.Request, response *restful.Response) {
-	pages := getAllPages()
+	pages := db.GetAllPages()
 	response.WriteEntity(pages)
-}
-
-func getAllPages() []content.Page {
-	rows := db.Query("SELECT * FROM gomic.pages")
-	return getDbData(rows)
-}
-
-func getDbData(rows *sql.Rows) []content.Page {
-	pages := []content.Page{}
-	if rows != nil {
-		defer rows.Close()
-		for rows.Next() {
-			var (
-				id         int
-				title      sql.NullString
-				path       sql.NullString
-				imgUrl     sql.NullString
-				disqusId   sql.NullString
-				act        sql.NullString
-				pageNumber int
-			)
-
-			rows.Scan(
-				&id,
-				&title,
-				&path,
-				&imgUrl,
-				&disqusId,
-				&act,
-				&pageNumber)
-
-			pages = append(pages, content.Page{
-				Id:         id,
-				Title:      title.String,
-				Path:       path.String,
-				ImgUrl:     imgUrl.String,
-				DisqusId:   disqusId.String,
-				Act:        act.String,
-				PageNumber: pageNumber})
-		}
-	}
-	return pages
 }
 
 func PostPage(request *restful.Request, response *restful.Response) {
