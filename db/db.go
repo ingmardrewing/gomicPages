@@ -14,7 +14,6 @@ var db *sql.DB
 
 func Initialize() {
 	dsn := config.GetDsn()
-	log.Println(dsn)
 	db = getDb(dsn)
 }
 

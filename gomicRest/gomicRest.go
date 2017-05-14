@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"log"
 
+	"golang.org/x/crypto/bcrypt"
+
 	restful "github.com/emicklei/go-restful"
+	"github.com/ingmardrewing/gomicRest/config"
 	"github.com/ingmardrewing/gomicRest/content"
 	"github.com/ingmardrewing/gomicRest/db"
 )
@@ -19,12 +22,28 @@ func New() *restful.WebService {
 		Produces(restful.MIME_JSON)
 
 	log.Printf("Starting server at localhost:8080 -- access with http://localhost:8080%s\n", pagePath)
-	service.Route(service.GET("/{page-id}").To(GetPage))
-	service.Route(service.GET("/").To(GetPages))
-	service.Route(service.PUT("/").To(PutPage))
-	service.Route(service.POST("/{page-id}").To(PostPage))
-	service.Route(service.DELETE("/{page-id}").To(DeletePage))
+	service.Route(service.GET("/{page-id}").Filter(basicAuthenticate).To(GetPage))
+	service.Route(service.GET("/").Filter(basicAuthenticate).To(GetPages))
+	service.Route(service.PUT("/").Filter(basicAuthenticate).To(PutPage))
+	service.Route(service.POST("/{page-id}").Filter(basicAuthenticate).To(PostPage))
+	service.Route(service.DELETE("/{page-id}").Filter(basicAuthenticate).To(DeletePage))
 	return service
+}
+
+func basicAuthenticate(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
+	fmt.Println("authenticating ...")
+	user, pass, _ := req.Request.BasicAuth()
+	password := []byte(pass)
+	stored_hash := []byte(config.GetPasswordHashForUser(user))
+
+	err := bcrypt.CompareHashAndPassword(stored_hash, password)
+	if err != nil {
+		resp.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
+		resp.WriteErrorString(401, "401: Not Authorized")
+		return
+	}
+
+	chain.ProcessFilter(req, resp)
 }
 
 func PutPage(request *restful.Request, response *restful.Response) {
@@ -42,8 +61,13 @@ func GetPage(request *restful.Request, response *restful.Response) {
 
 func getPage(id string) content.Page {
 	rows := db.Query(fmt.Sprintf("SELECT * FROM gomic.pages where id = %s", id))
-	pages := getDbData(rows)
-	return pages[0]
+	if rows != nil {
+		pages := getDbData(rows)
+		if len(pages) > 0 {
+			return pages[0]
+		}
+	}
+	return content.EmptyPage()
 }
 
 func GetPages(request *restful.Request, response *restful.Response) {
