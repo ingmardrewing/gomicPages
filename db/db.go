@@ -33,9 +33,9 @@ func Query(query string) *sql.Rows {
 }
 
 func Insert(p *content.Page) {
-	stmt, err := db.Prepare("INSERT INTO pages(title, path, imgUrl, disqusId, act, pageNumber) VALUES(?, ?, ?, ?, ?, ?)")
+	stmt, err := db.Prepare("INSERT INTO pages(title, description, path, imgUrl, disqusId, act, pageNumber) VALUES(?, ?, ?, ?, ?, ?, ?)")
 	handleErr(err)
-	res, err := stmt.Exec(p.Title, p.Path, p.ImgUrl, p.DisqusId, p.Act, p.PageNumber)
+	res, err := stmt.Exec(p.Title, p.Description, p.Path, p.ImgUrl, p.DisqusId, p.Act, p.PageNumber)
 	handleErr(err)
 	lastId, err := res.LastInsertId()
 	handleErr(err)
@@ -45,9 +45,9 @@ func Insert(p *content.Page) {
 }
 
 func Update(p *content.Page, id string) {
-	stmt, err := db.Prepare("UPDATE pages SET title=?, path=?, imgUrl=?, disqusId=?, act=?, pageNumber=? WHERE id=?")
+	stmt, err := db.Prepare("UPDATE pages SET title=?, description=?, path=?, imgUrl=?, disqusId=?, act=?, pageNumber=? WHERE id=?")
 	handleErr(err)
-	res, err := stmt.Exec(p.Title, p.Path, p.ImgUrl, p.DisqusId, p.Act, p.PageNumber, id)
+	res, err := stmt.Exec(p.Title, p.Description, p.Path, p.ImgUrl, p.DisqusId, p.Act, p.PageNumber, id)
 	handleErr(err)
 	lastId, err := res.LastInsertId()
 	handleErr(err)
@@ -101,18 +101,20 @@ func getDbData(rows *sql.Rows) []content.Page {
 		defer rows.Close()
 		for rows.Next() {
 			var (
-				id         int
-				title      sql.NullString
-				path       sql.NullString
-				imgUrl     sql.NullString
-				disqusId   sql.NullString
-				act        sql.NullString
-				pageNumber int
+				id          int
+				title       sql.NullString
+				description sql.NullString
+				path        sql.NullString
+				imgUrl      sql.NullString
+				disqusId    sql.NullString
+				act         sql.NullString
+				pageNumber  int
 			)
 
 			rows.Scan(
 				&id,
 				&title,
+				&description,
 				&path,
 				&imgUrl,
 				&disqusId,
@@ -120,13 +122,14 @@ func getDbData(rows *sql.Rows) []content.Page {
 				&pageNumber)
 
 			pages = append(pages, content.Page{
-				Id:         id,
-				Title:      title.String,
-				Path:       path.String,
-				ImgUrl:     imgUrl.String,
-				DisqusId:   disqusId.String,
-				Act:        act.String,
-				PageNumber: pageNumber})
+				Id:          id,
+				Title:       title.String,
+				Description: title.String,
+				Path:        path.String,
+				ImgUrl:      imgUrl.String,
+				DisqusId:    disqusId.String,
+				Act:         act.String,
+				PageNumber:  pageNumber})
 		}
 	}
 	return pages

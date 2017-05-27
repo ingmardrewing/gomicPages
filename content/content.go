@@ -5,10 +5,10 @@ package content
  */
 
 type Page struct {
-	Id, PageNumber                     int
-	Title, Path, ImgUrl, DisqusId, Act string
+	Id, PageNumber                                  int
+	Title, Description, Path, ImgUrl, DisqusId, Act string
 }
 
 func EmptyPage() Page {
-	return Page{0, 0, "", "", "", "", ""}
+	return Page{0, 0, "", "", "", "", "", ""}
 }
