@@ -7,8 +7,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"github.com/ingmardrewing/gomicRest/config"
-	"github.com/ingmardrewing/gomicRest/content"
+	"github.com/ingmardrewing/gomicPages/config"
+	"github.com/ingmardrewing/gomicPages/content"
 )
 
 var db *sql.DB

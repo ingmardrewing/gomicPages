@@ -5,24 +5,14 @@ import (
 	"net/http"
 
 	restful "github.com/emicklei/go-restful"
-	"github.com/ingmardrewing/gomicRest/db"
-	"github.com/ingmardrewing/gomicRest/gomicRest"
+	"github.com/ingmardrewing/gomicPages/db"
+	"github.com/ingmardrewing/gomicPages/service"
 )
-
-/**
- * struct for the comic page
- */
-
-type Page struct {
-	Id, PageNumber                     int
-	Title, Path, ImgUrl, DisqusId, Act string
-}
 
 func main() {
 	db.Initialize()
 
-	restful.Add(gomicRest.NewPagesService())
-	restful.Add(gomicRest.NewSocMedService())
+	restful.Add(service.NewPagesService())
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
