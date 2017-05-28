@@ -9,6 +9,10 @@ type Page struct {
 	Title, Description, Path, ImgUrl, DisqusId, Act string
 }
 
+type Pages struct {
+	Pages []Page
+}
+
 func EmptyPage() Page {
 	return Page{0, 0, "", "", "", "", "", ""}
 }

@@ -61,8 +61,9 @@ func GetPage(request *restful.Request, response *restful.Response) {
 }
 
 func GetPages(request *restful.Request, response *restful.Response) {
-	pages := db.GetAllPages()
-	response.WriteEntity(pages)
+	pgs := db.GetAllPages()
+	p := &content.Pages{pgs}
+	response.WriteEntity(p)
 }
 
 func PostPage(request *restful.Request, response *restful.Response) {
