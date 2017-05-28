@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"log"
 
 	"golang.org/x/crypto/bcrypt"
@@ -20,7 +19,6 @@ func NewPagesService() *restful.WebService {
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
-	log.Printf("Creating pages servicel at localhost:8080 -- access with http://localhost:8080%s\n", path)
 	srv.Route(srv.GET("/{page-id}").Filter(basicAuthenticate).To(GetPage))
 	srv.Route(srv.GET("/").Filter(basicAuthenticate).To(GetPages))
 	srv.Route(srv.PUT("/").Filter(basicAuthenticate).To(PutPage))
@@ -29,20 +27,24 @@ func NewPagesService() *restful.WebService {
 	return srv
 }
 
-func basicAuthenticate(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
-	fmt.Println("authenticating ...")
-	user, pass, _ := req.Request.BasicAuth()
-	password := []byte(pass)
-	stored_hash := []byte(config.GetPasswordHashForUser(user))
-
-	err := bcrypt.CompareHashAndPassword(stored_hash, password)
+func basicAuthenticate(request *restful.Request, response *restful.Response, chain *restful.FilterChain) {
+	err := authenticate(request)
+	log.Println(err)
 	if err != nil {
-		resp.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
-		resp.WriteErrorString(401, "401: Not Authorized")
+		response.AddHeader("WWW-Authenticate", "Basic realm=Protected Area")
+		response.WriteErrorString(401, "401: Not Authorized")
 		return
 	}
 
-	chain.ProcessFilter(req, resp)
+	chain.ProcessFilter(request, response)
+}
+
+func authenticate(req *restful.Request) error {
+	user, pass, _ := req.Request.BasicAuth()
+	given_pass := []byte(pass)
+	stored_hash := []byte(config.GetPasswordHashForUser(user))
+	//hash, _ := bcrypt.GenerateFromPassword(given_pass, coast)
+	return bcrypt.CompareHashAndPassword(stored_hash, given_pass)
 }
 
 func PutPage(request *restful.Request, response *restful.Response) {

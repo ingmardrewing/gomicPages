@@ -14,7 +14,7 @@ func main() {
 
 	restful.Add(service.NewPagesService())
 
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":8443", nil)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
