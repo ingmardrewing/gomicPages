@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	restful "github.com/emicklei/go-restful"
+	"github.com/ingmardrewing/gomicPages/config"
 	"github.com/ingmardrewing/gomicPages/db"
 	"github.com/ingmardrewing/gomicPages/service"
 )
@@ -14,7 +15,11 @@ func main() {
 
 	restful.Add(service.NewPagesService())
 
-	err := http.ListenAndServe(":8443", nil)
+	crt, key := config.GetTlsPaths()
+	log.Println("Reading crt and key data from files:")
+	log.Println(crt)
+	log.Println(key)
+	err := http.ListenAndServeTLS(":8443", crt, key, nil)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

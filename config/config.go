@@ -24,6 +24,12 @@ func GetTwitterConsumerKey() string {
 	return s
 }
 
+func GetTlsPaths() (string, string) {
+	cert := os.Getenv("TLS_CERT_PATH")
+	key := os.Getenv("TLS_KEY_PATH")
+	return cert, key
+}
+
 func GetTwitterConsumerSecret() string {
 	s := os.Getenv("TWITTER_ORIGIN_CONSUMER_SECRET")
 	fmt.Println(s)
