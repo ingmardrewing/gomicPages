@@ -32,10 +32,8 @@ func Query(query string) *sql.Rows {
 	return rows
 }
 
-func GetHighestPageNumber() int {
-	var nr int
-	db.QueryRow("SELECT MAX(pageNumber) FROM pages").Scan(&nr)
-	return nr
+func QueryRow(query string, results ...interface{}) {
+	db.QueryRow(query).Scan(results...)
 }
 
 func Insert(p *content.Page) {

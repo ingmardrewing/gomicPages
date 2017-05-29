@@ -50,7 +50,8 @@ func authenticate(req *restful.Request) error {
 func PutPage(request *restful.Request, response *restful.Response) {
 	p := new(content.Page)
 	request.ReadEntity(p)
-	nr := db.GetHighestPageNumber()
+	var nr int
+	db.QueryRow("SELECT MAX(pageNumber) FROM pages", &nr)
 	p.PageNumber = nr + 1
 	db.Insert(p)
 	response.WriteEntity(p)
